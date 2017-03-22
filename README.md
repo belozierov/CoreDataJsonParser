@@ -5,6 +5,7 @@ JSON to Core Data parser
 
 #### `JSON`
 
+```json
 {
 	"countries": [
 		{
@@ -42,6 +43,7 @@ JSON to Core Data parser
         }
     ]
 }
+```
 
 #### `Model`
 
