@@ -9,7 +9,7 @@ JSON to Core Data parser
 {
 	"countries": [
 		{
-			"id": 111,
+			"id": "111",
 			"name": "France",
 			"details": {
 				"capital": "Paris",
@@ -22,7 +22,7 @@ JSON to Core Data parser
 			}
         	},
         	{
-			"id": 345,
+			"id": "345",
 			"name": "Germany",
 			"details": {
 				"capital": "Berlin",
