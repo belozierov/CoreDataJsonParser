@@ -48,15 +48,15 @@ extension NSManagedObject {
         parse(json: dictionary, attributes: entity.attributesByName, relationships: relationships)
     }
     
-    // MARK: - Properties parsing
+    // MARK: - Private parsing
     
     private func parse(json: JsonDictionary, attributes: [String: NSAttributeDescription], relationships: [String: NSRelationshipDescription]?) {
         let changedKeys = getChangedKeys(json: json)
-        for (key, json) in json where changedKeys?.contains(key) != true {
+        for (key, wrapper) in json where changedKeys?.contains(key) != true {
             if let attributeValue = attributes[key] {
-                parse(key: key, node: json, attributeValue: attributeValue)
+                parse(key: key, wrapper: wrapper, attributeValue: attributeValue)
             } else if let relationshipsValue = relationships?[key] {
-                parse(key: key, node: json, relationshipsValue: relationshipsValue)
+                parse(key: key, wrapper: wrapper, relationshipsValue: relationshipsValue)
             }
         }
         jsonParsed()
@@ -68,37 +68,46 @@ extension NSManagedObject {
         return map.changedKeys
     }
     
-    private func parse(key: String, node: JsonWrapper, attributeValue: NSAttributeDescription) {
+    // MARK: - Attributes
+    
+    private func parse(key: String, wrapper: JsonWrapper, attributeValue: NSAttributeDescription) {
         switch attributeValue.attributeType {
-        case .stringAttributeType: tryToSetValue(node.string, for: key)
-        case .integer16AttributeType: tryToSetValue(node.int16, for: key)
-        case .integer32AttributeType: tryToSetValue(node.int32, for: key)
-        case .integer64AttributeType: tryToSetValue(node.int64, for: key)
-        case .floatAttributeType: tryToSetValue(node.float, for: key)
-        case .doubleAttributeType: tryToSetValue(node.double, for: key)
-        case .booleanAttributeType: tryToSetValue(node.bool, for: key)
-        case .dateAttributeType: tryToSetValue(node.date, for: key)
-        case .binaryDataAttributeType: tryToSetValue(node.data, for: key)
+        case .stringAttributeType: tryToSetValue(wrapper.string, for: key)
+        case .integer16AttributeType: tryToSetValue(wrapper.int16, for: key)
+        case .integer32AttributeType: tryToSetValue(wrapper.int32, for: key)
+        case .integer64AttributeType: tryToSetValue(wrapper.int64, for: key)
+        case .floatAttributeType: tryToSetValue(wrapper.float, for: key)
+        case .doubleAttributeType: tryToSetValue(wrapper.double, for: key)
+        case .booleanAttributeType: tryToSetValue(wrapper.bool, for: key)
+        case .dateAttributeType: tryToSetValue(wrapper.date, for: key)
+        case .binaryDataAttributeType: tryToSetValue(wrapper.data, for: key)
         default: break
         }
     }
     
-    private func parse(key: String, node: JsonWrapper, relationshipsValue: NSRelationshipDescription) {
+    private func tryToSetValue(_ value: Any?, for key: String) {
+        guard let value = value else { return }
+        setValue(value, forKey: key)
+    }
+    
+    // MARK: - Relationships
+    
+    private func parse(key: String, wrapper: JsonWrapper, relationshipsValue: NSRelationshipDescription) {
         if let destination = relationshipsValue.destinationEntity {
             let attributes = destination.attributesByName
             let relationships = destination.relationshipsByName
             if relationshipsValue.isToMany {
-                if let dictionary = node.dictionary {
+                if let dictionary = wrapper.dictionary {
                     let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
                     object.parse(json: dictionary, attributes: attributes, relationships: relationships)
                     switch relationshipsValue.isOrdered {
                     case true: mutableOrderedSetValue(forKey: key).add(object)
                     case false: mutableSetValue(forKey: key).add(object)
                     }
-                } else if let array = node.array {
+                } else if let array = wrapper.array {
                     let isOrdered = relationshipsValue.isOrdered
-                    for node in array {
-                        if let dict = node.dictionary {
+                    for wrapper in array {
+                        if let dict = wrapper.dictionary {
                             let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
                             object.parse(json: dict, attributes: attributes, relationships: relationships)
                             switch isOrdered {
@@ -108,7 +117,7 @@ extension NSManagedObject {
                         }
                     }
                 }
-            } else if let dict = node.dictionary ?? node.first?.dictionary {
+            } else if let dict = wrapper.dictionary ?? wrapper.first?.dictionary {
                 let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
                 object.parse(json: dict, attributes: attributes, relationships: relationships)
                 setValue(object, forKey: key)
@@ -116,12 +125,7 @@ extension NSManagedObject {
         }
     }
     
-    private func tryToSetValue(_ value: Any?, for key: String) {
-        guard let value = value else { return }
-        setValue(value, forKey: key)
-    }
-    
-    // MARK: - setValues
+    // MARK: - Delegate
     
     func manualSetValue(map: JsonMap) {}
     func jsonParsed() {}
