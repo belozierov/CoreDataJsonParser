@@ -20,8 +20,8 @@ JSON to Core Data parser
 					"name": "Paris",
 					"population": 2243833
 			}
-        },
-        {
+        	},
+        	{
 			"id": 345,
 			"name": "Germany",
 			"details": {
