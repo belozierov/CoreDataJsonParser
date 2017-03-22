@@ -18,12 +18,9 @@ extension NSManagedObject {
     
     func parse(_ any: Any, options: [Options] = []) {
         switch any {
-        case let json as JsonWrapper: parse(json, options: options)
-        case let dict as [String: Any]: parse(dict, options: options)
-        case let data as Data: parse(data, options: options)
-        case let string as String: parse(string, options: options)
-        case let array as [[String: Any]] where !array.isEmpty: parse(array.first!, options: options)
-        default: break
+        case let data as Data: parse(json(data), options: options)
+        case let string as String: parse(json(string), options: options)
+        default: parse(json(any), options: options)
         }
     }
     
@@ -35,26 +32,22 @@ extension NSManagedObject {
     // MARK: - Private parsing
     
     func parse(_ string: String, options: [Options] = []) {
-        guard let data = string.data(using: .utf8) else { return }
-        parse(data, options: options)
+        parse(json(string), options: options)
+    }
+    
+    func parse(_ data: Data, options: [Options] = []) {
+        parse(json(data), options: options)
+    }
+    
+    func parse(_ dict: [String: Any], options: [Options] = []) {
+        let relationships = options.contains(.onlyAttributes) ? nil : entity.relationshipsByName
+        parse(json: JsonDictionary(dict), attributes: entity.attributesByName, relationships: relationships)
     }
     
     func parse(_ json: JsonWrapper, options: [Options] = []) {
         guard let dictionary = json.dictionary ?? json.first?.dictionary else { return }
         let relationships = options.contains(.onlyAttributes) ? nil : entity.relationshipsByName
         parse(json: dictionary, attributes: entity.attributesByName, relationships: relationships)
-    }
-    
-    func parse(_ data: Data, options: [Options] = []) {
-        do {
-            guard let dict = try JSONSerialization.jsonObject(with: data, options: [.allowFragments]) as? [String: Any] else { return }
-            parse(dict, options: options)
-        } catch {}
-    }
-    
-    func parse(_ dict: [String: Any], options: [Options] = []) {
-        let relationships = options.contains(.onlyAttributes) ? nil : entity.relationshipsByName
-        parse(json: JsonDictionary(dict), attributes: entity.attributesByName, relationships: relationships)
     }
     
     // MARK: - Properties parsing
