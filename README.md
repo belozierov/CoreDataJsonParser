@@ -91,6 +91,6 @@ class City: NSManagedObject {
 let context: NSManagedObjectContext = SomeContext
 let any: Any = SomeAny
 
-let countries = json(any).array.map { Country(context: context).parsed($0) }
+let countries = json(any).array?.map { Country(context: context).parsed($0) }
 
 ```
