@@ -85,3 +85,12 @@ class City: NSManagedObject {
     
 }
 ```
+#### `Parsing`
+
+```swift
+let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+let any: Any = SomeAny
+
+let countries = json(any).array.map { Country(context: context).parsed($0) }
+
+```
