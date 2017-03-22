@@ -29,8 +29,6 @@ extension NSManagedObject {
         return self
     }
     
-    // MARK: - Private parsing
-    
     func parse(_ string: String, options: [Options] = []) {
         parse(json(string), options: options)
     }
@@ -52,10 +50,10 @@ extension NSManagedObject {
     
     // MARK: - Properties parsing
     
-    private func parse(json: JsonDictionary, attributes: [String: NSAttributeDescription]?, relationships: [String: NSRelationshipDescription]?) {
+    private func parse(json: JsonDictionary, attributes: [String: NSAttributeDescription], relationships: [String: NSRelationshipDescription]?) {
         let changedKeys = getChangedKeys(json: json)
         for (key, json) in json where changedKeys?.contains(key) != true {
-            if let attributeValue = attributes?[key] {
+            if let attributeValue = attributes[key] {
                 parse(key: key, node: json, attributeValue: attributeValue)
             } else if let relationshipsValue = relationships?[key] {
                 parse(key: key, node: json, relationshipsValue: relationshipsValue)
