@@ -105,16 +105,16 @@ extension NSManagedObject {
                     case false: mutableSetValue(forKey: key).add(object)
                     }
                 } else if let array = wrapper.array {
-                    let isOrdered = relationshipsValue.isOrdered
+                    var objects = [NSManagedObject]()
                     for wrapper in array {
-                        if let dict = wrapper.dictionary {
-                            let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
-                            object.parse(json: dict, attributes: attributes, relationships: relationships)
-                            switch isOrdered {
-                            case true: mutableOrderedSetValue(forKey: key).add(object)
-                            case false: mutableSetValue(forKey: key).add(object)
-                            }
-                        }
+                        guard let dict = wrapper.dictionary else { continue }
+                        let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
+                        object.parse(json: dict, attributes: attributes, relationships: relationships)
+                        objects.append(object)
+                    }
+                    switch relationshipsValue.isOrdered {
+                    case true: mutableOrderedSetValue(forKey: key).addObjects(from: objects)
+                    case false: mutableSetValue(forKey: key).addObjects(from: objects)
                     }
                 }
             } else if let dict = wrapper.dictionary ?? wrapper.first?.dictionary {
