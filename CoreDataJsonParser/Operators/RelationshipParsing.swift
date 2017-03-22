@@ -14,8 +14,8 @@ func <- (left: NSManagedObject, right: Any?) {
 }
 
 func <- <T: NSManagedObject>(left: inout T?, right: JsonMap?) {
-    guard let map = right else { return }
-    left = T(entity: T.entity(), insertInto: map.context).parsed(map.wrapper)
+    guard let map = right, let entity = entityDescription(map: map, type: T.self) else { return }
+    left = T(entity: entity, insertInto: map.context).parsed(map.wrapper)
 }
 
 func <- <T: NSManagedObject>(left: inout Set<T>, right: JsonMap?) {
