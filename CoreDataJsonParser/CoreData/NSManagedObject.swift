@@ -72,21 +72,31 @@ extension NSManagedObject {
     
     private func parse(key: String, wrapper: JsonWrapper, attributeValue: NSAttributeDescription) {
         switch attributeValue.attributeType {
-        case .stringAttributeType: tryToSetValue(wrapper.string, for: key)
-        case .integer16AttributeType: tryToSetValue(wrapper.int16, for: key)
-        case .integer32AttributeType: tryToSetValue(wrapper.int32, for: key)
-        case .integer64AttributeType: tryToSetValue(wrapper.int64, for: key)
-        case .floatAttributeType: tryToSetValue(wrapper.float, for: key)
-        case .doubleAttributeType: tryToSetValue(wrapper.double, for: key)
-        case .booleanAttributeType: tryToSetValue(wrapper.bool, for: key)
-        case .dateAttributeType: tryToSetValue(wrapper.date, for: key)
-        case .binaryDataAttributeType: tryToSetValue(wrapper.data, for: key)
+        case .stringAttributeType: tryToSet(wrapper.string, for: key)
+        case .integer16AttributeType: tryToSet(wrapper.int16, for: key)
+        case .integer32AttributeType: tryToSet(wrapper.int32, for: key)
+        case .integer64AttributeType: tryToSet(wrapper.int64, for: key)
+        case .floatAttributeType: tryToSet(wrapper.float, for: key)
+        case .doubleAttributeType: tryToSet(wrapper.double, for: key)
+        case .booleanAttributeType: tryToSet(wrapper.bool, for: key)
+        case .dateAttributeType: tryToSet(wrapper.date, for: key)
+        case .binaryDataAttributeType: tryToSet(wrapper.data, for: key)
+        case .transformableAttributeType: tryToSetTransformable(wrapper.any, for: key)
         default: break
         }
     }
     
-    private func tryToSetValue(_ value: Any?, for key: String) {
+    private func tryToSet(_ value: Any?, for key: String) {
         guard let value = value else { return }
+        setValue(value, forKey: key)
+    }
+    
+    private func tryToSetTransformable(_ value: Any, for key: String) {
+        guard let stringType = objcCType(of: key),
+            let classType = NSClassFromString(stringType),
+            (value as? NSObject)?.isKind(of: classType) == true
+            else { return }
+        debugPrint("good")
         setValue(value, forKey: key)
     }
     
@@ -123,6 +133,43 @@ extension NSManagedObject {
                 setValue(object, forKey: key)
             }
         }
+    }
+    
+    // MARK: - Transformable
+    
+    private func objcCType(of key: String) -> String? {
+        var count = UInt32()
+        guard let properties = class_copyPropertyList(classForCoder, &count) else { return nil }
+        var result: String?
+        for i in 0..<Int(count) {
+            guard let property = properties[i],
+                let name = NSString(utf8String: property_getName(property)), String(name) == key
+                else { continue }
+            guard let attributes = NSString(utf8String: property_getAttributes(property))
+                else { break }
+            let slices = attributes.components(separatedBy: "\"")
+            if slices.count > 1 {
+                result = slices[1]
+            } else if attributes.length > 1 {
+                switch attributes.substring(with: NSRange(location: 1, length: 1)) {
+                case "c": result = "Int8"
+                case "s": result = "Int16"
+                case "i": result = "Int32"
+                case "q": result = "Int"
+                case "S": result = "UInt16"
+                case "I": result = "UInt32"
+                case "Q": result = "UInt"
+                case "B": result = "Bool"
+                case "d": result = "Double"
+                case "f": result = "Float"
+                case "{": result = "Decimal"
+                default: break
+                }
+            }
+            break
+        }
+        free(properties)
+        return result
     }
     
     // MARK: - Delegate
