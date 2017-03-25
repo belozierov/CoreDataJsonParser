@@ -19,7 +19,7 @@ struct JsonArray: JsonCollectionWrapper, JsonConvertable {
     // MARK: - JsonWrapper
     
     var any: Any {
-        return _array
+        return _array.flatMap { $0 is NSNull ? nil : $0 }
     }
     
     var array: JsonArray? {

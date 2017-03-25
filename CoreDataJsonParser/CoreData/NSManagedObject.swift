@@ -92,12 +92,11 @@ extension NSManagedObject {
     }
     
     private func tryToSetTransformable(_ value: Any, for key: String) {
-        guard let stringType = objcCType(of: key),
+        if let stringType = objcCType(of: key, anyClass: classForCoder),
             let classType = NSClassFromString(stringType),
-            (value as? NSObject)?.isKind(of: classType) == true
-            else { return }
-        debugPrint("good")
-        setValue(value, forKey: key)
+            (value as? NSObject)?.isKind(of: classType) == true {
+            setValue(value, forKey: key)
+        }
     }
     
     // MARK: - Relationships
@@ -137,9 +136,9 @@ extension NSManagedObject {
     
     // MARK: - Transformable
     
-    private func objcCType(of key: String) -> String? {
+    private func objcCType(of key: String, anyClass: AnyClass) -> String? {
         var count = UInt32()
-        guard let properties = class_copyPropertyList(classForCoder, &count) else { return nil }
+        guard let properties = class_copyPropertyList(anyClass, &count) else { return nil }
         var result: String?
         for i in 0..<Int(count) {
             guard let property = properties[i],
@@ -169,6 +168,9 @@ extension NSManagedObject {
             break
         }
         free(properties)
+        if result == nil, let superclass = superclass as? NSManagedObject.Type {
+            result = objcCType(of: key, anyClass: superclass)
+        }
         return result
     }
     

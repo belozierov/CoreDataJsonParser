@@ -22,7 +22,11 @@ struct JsonDictionary: JsonCollectionWrapper, JsonConvertable {
     }
     
     var any: Any {
-        return _dictionary
+        var dictionary = _dictionary
+        for (key, value) in _dictionary where value is NSNull {
+            dictionary[key] = nil
+        }
+        return dictionary
     }
     
     var dictionary: JsonDictionary? {
