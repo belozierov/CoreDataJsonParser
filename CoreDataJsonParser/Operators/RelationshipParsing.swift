@@ -42,6 +42,35 @@ func <- <T: NSManagedObject>(left: inout [T]?, right: JsonMap?) {
     left = array
 }
 
+// MARK: - iOS 9
+
+func <- <T: NSManagedObject>(left: inout NSSet?, right: (map: JsonMap?, type: T.Type)) {
+    guard let map = right.map else { return }
+    var set = Set<T>()
+    parse(set: &set, map: map)
+    if let leftSet = left {
+        let mutableSet = NSMutableSet(set: leftSet)
+        mutableSet.addingObjects(from: set)
+        left = mutableSet
+    } else {
+        left = NSSet(set: set)
+    }
+}
+
+func <- <T: NSManagedObject>(left: inout NSOrderedSet?, right: (map: JsonMap?, type: T.Type)) {
+    guard let map = right.map else { return }
+    var array = [T]()
+    parse(array: &array, map: map)
+    debugPrint(array)
+    if let leftArray = left {
+        let mutableSet = NSMutableOrderedSet(orderedSet: leftArray)
+        mutableSet.addObjects(from: array)
+        left = mutableSet
+    } else {
+        left = NSMutableOrderedSet(array: array)
+    }
+}
+
 // MARK: - Private metodes
 
 private func parse<T: NSManagedObject>(set: inout Set<T>, map: JsonMap) {

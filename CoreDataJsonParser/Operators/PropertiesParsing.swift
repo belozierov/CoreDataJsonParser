@@ -18,8 +18,6 @@ func <- <T>(left: inout T?, right: Any?) {
     left = right
 }
 
-// MARK: - JsonWrapper
-
 func <- <T>(left: inout T, right: JsonWrapper?) {
     guard let right = right?.any as? T else { return }
     left = right
@@ -38,6 +36,16 @@ func <- <T: SimpleInit>(left: inout T, right: Any?) {
 }
 
 func <- <T: SimpleInit>(left: inout T?, right: Any?) {
+    guard let value = parse(any: right, to: T.self) else { return }
+    left = value
+}
+
+func <- <T: SimpleInit>(left: inout T, right: JsonWrapper?) {
+    guard let value = parse(any: right, to: T.self) else { return }
+    left = value
+}
+
+func <- <T: SimpleInit>(left: inout T?, right: JsonWrapper?) {
     guard let value = parse(any: right, to: T.self) else { return }
     left = value
 }
