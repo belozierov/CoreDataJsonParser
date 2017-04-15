@@ -37,8 +37,8 @@ protocol JsonWrapper {
 
 extension JsonWrapper {
     
-    func transformed(_ function: (JsonWrapper) -> Any?) -> JsonWrapper {
-        guard let any = function(self) else { return self }
+    func transformed(_ function: (JsonWrapper) -> Any?) -> JsonWrapper? {
+        guard let any = function(self) else { return nil }
         return json(any)
     }
     
@@ -48,7 +48,7 @@ extension JsonWrapper {
     var array: JsonArray? { return nil }
     var dictionary: JsonDictionary? { return nil }
     subscript(key: String) -> JsonWrapper? { return nil }
-    subscript(position: Int) -> JsonWrapper { return json(NSNull()) }
+    subscript(position: Int) -> JsonWrapper { return JsonValue(NSNull()) }
     
 }
 

@@ -17,6 +17,7 @@ final class JsonMetaMap: JsonMap {
     }
     
     override subscript(position: Int) -> JsonMap {
+        beginObservingKeys()
         return super[position]
     }
     

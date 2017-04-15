@@ -18,21 +18,11 @@ func <- <T: NSManagedObject>(left: inout T?, right: JsonMap?) {
     left = T(entity: entity, insertInto: map.context).parsed(map.wrapper)
 }
 
-func <- <T: NSManagedObject>(left: inout Set<T>, right: JsonMap?) {
-    guard let map = right else { return }
-    parse(set: &left, map: map)
-}
-
 func <- <T: NSManagedObject>(left: inout Set<T>?, right: JsonMap?) {
     guard let map = right else { return }
     var set = Set<T>()
     parse(set: &set, map: map)
     left = set
-}
-
-func <- <T: NSManagedObject>(left: inout [T], right: JsonMap?) {
-    guard let map = right else { return }
-    parse(array: &left, map: map)
 }
 
 func <- <T: NSManagedObject>(left: inout [T]?, right: JsonMap?) {
@@ -61,7 +51,6 @@ func <- <T: NSManagedObject>(left: inout NSOrderedSet?, right: (map: JsonMap?, t
     guard let map = right.map else { return }
     var array = [T]()
     parse(array: &array, map: map)
-    debugPrint(array)
     if let leftArray = left {
         let mutableSet = NSMutableOrderedSet(orderedSet: leftArray)
         mutableSet.addObjects(from: array)
