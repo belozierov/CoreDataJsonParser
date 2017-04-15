@@ -16,9 +16,9 @@ final class JsonMetaMap: JsonMap {
         return map
     }
     
-    override subscript(position: Int) -> JsonMap {
+    override var first: JsonWrapper? {
         beginObservingKeys()
-        return super[position]
+        return super.first
     }
     
     // MARK: - Changed keys
