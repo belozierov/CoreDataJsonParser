@@ -42,12 +42,12 @@ extension Bool: SimpleInit {
 
 extension Int: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let value = Int(string) { self = value }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = number.intValue
     }
     
@@ -55,12 +55,12 @@ extension Int: SimpleInit {
 
 extension Int16: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let value = Int16(string) { self = value }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = number.int16Value
     }
     
@@ -68,12 +68,12 @@ extension Int16: SimpleInit {
 
 extension Int32: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let value = Int32(string) { self = value }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = number.int32Value
     }
     
@@ -81,12 +81,12 @@ extension Int32: SimpleInit {
 
 extension Int64: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let value = Int64(string) { self = value }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = number.int64Value
     }
     
@@ -94,12 +94,12 @@ extension Int64: SimpleInit {
 
 extension Float: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let value = Float(string) { self = value }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = number.floatValue
     }
     
@@ -107,12 +107,12 @@ extension Float: SimpleInit {
 
 extension Double: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let value = Double(string) { self = value }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = number.doubleValue
     }
     
@@ -120,12 +120,12 @@ extension Double: SimpleInit {
 
 extension Date: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let time = TimeInterval(string) { self = Date(timeIntervalSince1970: time) }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         self = Date(timeIntervalSince1970: number.doubleValue)
     }
     
@@ -133,12 +133,12 @@ extension Date: SimpleInit {
 
 extension Data: SimpleInit {
     
-    internal init?(string: String) {
+    init?(string: String) {
         if let data = Data(base64Encoded: string) { self = data }
         else { return nil }
     }
     
-    internal init?(number: NSNumber) {
+    init?(number: NSNumber) {
         if let data = Data(base64Encoded: number.stringValue) { self = data }
         else { return nil }
     }

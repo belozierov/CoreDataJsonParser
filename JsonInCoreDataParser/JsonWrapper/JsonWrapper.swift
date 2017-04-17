@@ -54,15 +54,15 @@ extension JsonWrapper {
 
 extension JsonWrapper where Self: JsonConvertable {
     
-    var string: String? { return convert(to: String.self) }
-    var bool: Bool? { return convert(to: Bool.self) }
-    var int: Int? { return convert(to: Int.self) }
-    var int16: Int16? { return convert(to: Int16.self) }
-    var int32: Int32? { return convert(to: Int32.self) }
-    var int64: Int64? { return convert(to: Int64.self) }
-    var float: Float? { return convert(to: Float.self) }
-    var double: Double? { return convert(to: Double.self) }
-    var date: Date? { return convert(to: Date.self) }
-    var data: Data? { return convert(to: Data.self) }
+    var string: String? { return converted() }
+    var bool: Bool? { return converted() }
+    var int: Int? { return converted() }
+    var int16: Int16? { return converted() }
+    var int32: Int32? { return converted() }
+    var int64: Int64? { return converted() }
+    var float: Float? { return converted() }
+    var double: Double? { return converted() }
+    var date: Date? { return converted() }
+    var data: Data? { return converted() }
 
 }

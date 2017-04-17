@@ -11,14 +11,13 @@ import Foundation
 protocol JsonConvertable {
     
     var any: Any { get }
-    func convert<T: SimpleInit>(to type: T.Type) -> T?
-    func convert<T: SimpleInit>(to type: T?.Type) -> T?
+    func converted<T: SimpleInit>() -> T?
     
 }
 
 extension JsonConvertable {
     
-    func convert<T: SimpleInit>(to type: T.Type) -> T? {
+    func converted<T: SimpleInit>() -> T? {
         switch any {
         case let t as T: return t
         case let string as String: return T(string: string)
@@ -27,15 +26,11 @@ extension JsonConvertable {
         }
     }
     
-    func convert<T: SimpleInit>(to type: T?.Type) -> T? {
-        return convert(to: T.self)
-    }
-    
 }
 
 extension JsonConvertable where Self: JsonCollectionWrapper {
     
-    func convert<T: SimpleInit>(to type: T.Type) -> T? {
+    func converted<T: SimpleInit>() -> T? {
         switch first?.any {
         case let t as T: return t
         case let string as String: return T(string: string)
@@ -43,9 +38,5 @@ extension JsonConvertable where Self: JsonCollectionWrapper {
         default: return nil
         }
     }
-    
-    func convert<T: SimpleInit>(to type: T?.Type) -> T? {
-        return convert(to: T.self)
-    }
-    
+
 }

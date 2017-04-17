@@ -31,30 +31,25 @@ func <- <T>(left: inout T?, right: JsonWrapper?) {
 // MARK: - SimpleInit
 
 func <- <T: SimpleInit>(left: inout T, right: Any?) {
-    guard let value = parse(any: right, to: T.self) else { return }
+    guard let value: T = convert(any: right) else { return }
     left = value
 }
 
 func <- <T: SimpleInit>(left: inout T?, right: Any?) {
-    guard let value = parse(any: right, to: T.self) else { return }
+    guard let value: T = convert(any: right) else { return }
     left = value
 }
 
 func <- <T: SimpleInit>(left: inout T, right: JsonWrapper?) {
-    guard let value = parse(any: right, to: T.self) else { return }
+    guard let value: T = convert(any: right) else { return }
     left = value
 }
 
 func <- <T: SimpleInit>(left: inout T?, right: JsonWrapper?) {
-    guard let value = parse(any: right, to: T.self) else { return }
+    guard let value: T = convert(any: right) else { return }
     left = value
 }
 
-private func parse<T: SimpleInit>(any: Any?, to type: T.Type) -> T? {
-    if let value = any as? T {
-        return value
-    } else if let convertable = any as? JsonConvertable, let value = convertable.convert(to: type) {
-        return value
-    }
-    return nil
+private func convert<T: SimpleInit>(any: Any?) -> T? {
+    return any as? T ?? (any as? JsonConvertable)?.converted()
 }
