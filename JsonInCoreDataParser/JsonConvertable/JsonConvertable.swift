@@ -10,14 +10,13 @@ import Foundation
 
 protocol JsonConvertable {
     
-    var any: Any { get }
     func converted<T: SimpleInit>() -> T?
     
 }
 
 extension JsonConvertable {
     
-    func converted<T: SimpleInit>() -> T? {
+    fileprivate func _convert<T: SimpleInit>(any: Any?) -> T? {
         switch any {
         case let t as T: return t
         case let string as String: return T(string: string)
@@ -28,15 +27,19 @@ extension JsonConvertable {
     
 }
 
-extension JsonConvertable where Self: JsonCollectionWrapper {
+extension JsonConvertable where Self: JsonWrapper {
     
     func converted<T: SimpleInit>() -> T? {
-        switch first?.any {
-        case let t as T: return t
-        case let string as String: return T(string: string)
-        case let number as NSNumber: return T(number: number)
-        default: return nil
-        }
+        return _convert(any: any)
+    }
+    
+}
+
+extension JsonConvertable where Self: Collection, Self.Iterator.Element == JsonWrapper {
+    
+    func converted<T: SimpleInit>() -> T? {
+        guard count == 1 else { return nil }
+        return _convert(any: first?.any)
     }
 
 }

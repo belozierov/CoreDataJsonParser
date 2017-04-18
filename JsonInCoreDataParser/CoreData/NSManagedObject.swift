@@ -43,7 +43,8 @@ extension NSManagedObject {
     }
     
     func parse(_ json: JsonWrapper, options: [Options] = []) {
-        guard let dictionary = json.dictionary ?? json.first?.dictionary else { return }
+        let dictionary = json.dictionary
+        if dictionary.isEmpty { return }
         let relationships = options.contains(.onlyAttributes) ? nil : entity.relationshipsByName
         parse(json: dictionary, attributes: entity.attributesByName, relationships: relationships)
     }
@@ -91,8 +92,8 @@ extension NSManagedObject {
         setValue(value, forKey: key)
     }
     
-    private func tryToSetTransformable(_ value: Any, for key: String) {
-        if let stringType = objcCType(of: key, anyClass: classForCoder),
+    private func tryToSetTransformable(_ value: Any?, for key: String) {
+        if let value = value, let stringType = objcCType(of: key, anyClass: classForCoder),
             let classType = NSClassFromString(stringType),
             (value as? NSObject)?.isKind(of: classType) == true {
             setValue(value, forKey: key)
@@ -102,35 +103,27 @@ extension NSManagedObject {
     // MARK: - Relationships
     
     private func parse(key: String, wrapper: JsonWrapper, relationshipsValue: NSRelationshipDescription) {
-        if let destination = relationshipsValue.destinationEntity {
-            let attributes = destination.attributesByName
-            let relationships = destination.relationshipsByName
-            if relationshipsValue.isToMany {
-                if let dictionary = wrapper.dictionary {
-                    let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
-                    object.parse(json: dictionary, attributes: attributes, relationships: relationships)
-                    switch relationshipsValue.isOrdered {
-                    case true: mutableOrderedSetValue(forKey: key).add(object)
-                    case false: mutableSetValue(forKey: key).add(object)
-                    }
-                } else if let array = wrapper.array {
-                    var objects = [NSManagedObject]()
-                    for wrapper in array {
-                        guard let dict = wrapper.dictionary else { continue }
-                        let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
-                        object.parse(json: dict, attributes: attributes, relationships: relationships)
-                        objects.append(object)
-                    }
-                    switch relationshipsValue.isOrdered {
-                    case true: mutableOrderedSetValue(forKey: key).addObjects(from: objects)
-                    case false: mutableSetValue(forKey: key).addObjects(from: objects)
-                    }
-                }
-            } else if let dict = wrapper.dictionary ?? wrapper.first?.dictionary {
-                let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
-                object.parse(json: dict, attributes: attributes, relationships: relationships)
-                setValue(object, forKey: key)
+        guard let destination = relationshipsValue.destinationEntity else { return }
+        let attributes = destination.attributesByName
+        let relationships = destination.relationshipsByName
+        func parseDict(_ dict: JsonDictionary) -> NSManagedObject? {
+            if dict.isEmpty { return nil }
+            let object = NSManagedObject(entity: destination, insertInto: managedObjectContext)
+            object.parse(json: dict, attributes: attributes, relationships: relationships)
+            return object
+        }
+        if relationshipsValue.isToMany {
+            var objects = [NSManagedObject]()
+            for wrapper in wrapper.array {
+                guard let object = parseDict(wrapper.dictionary) else { continue }
+                objects.append(object)
             }
+            switch relationshipsValue.isOrdered {
+            case true: mutableOrderedSetValue(forKey: key).addObjects(from: objects)
+            case false: mutableSetValue(forKey: key).addObjects(from: objects)
+            }
+        } else if let object = parseDict(wrapper.dictionary) {
+            setValue(object, forKey: key)
         }
     }
     

@@ -8,9 +8,9 @@
 
 struct JsonValue: JsonWrapper, JsonConvertable {
     
-    let any: Any
+    let any: Any?
     
-    init(_ any: Any) {
+    init(_ any: Any?) {
         self.any = any
     }
     

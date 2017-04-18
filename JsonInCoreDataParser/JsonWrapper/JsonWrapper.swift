@@ -6,11 +6,9 @@
 //  Copyright © 2017 Beloizerov. All rights reserved.
 //
 
-import Foundation
-
 protocol JsonWrapper {
     
-    var any: Any { get }
+    var any: Any? { get }
     
     // MARK: - Values
     
@@ -27,10 +25,9 @@ protocol JsonWrapper {
     
     // MARK: - Relations
     
-    var first: JsonWrapper? { get }
-    var array: JsonArray? { get }
-    var dictionary: JsonDictionary? { get }
-    subscript(key: String) -> JsonWrapper? { get }
+    var array: JsonArray { get }
+    var dictionary: JsonDictionary { get }
+    subscript(key: String) -> JsonWrapper { get }
     subscript(position: Int) -> JsonWrapper { get }
     
 }
@@ -42,13 +39,25 @@ extension JsonWrapper {
         return json(any)
     }
     
+    // MARK: - Values
+    
+    var string: String? { return nil }
+    var bool: Bool? { return nil }
+    var int: Int? { return nil }
+    var int16: Int16? { return nil }
+    var int32: Int32? { return nil }
+    var int64: Int64? { return nil }
+    var float: Float? { return nil }
+    var double: Double? { return nil }
+    var date: Date? { return nil }
+    var data: Data? { return nil }
+    
     // MARK: - Relations
     
-    var first: JsonWrapper? { return nil }
-    var array: JsonArray? { return nil }
-    var dictionary: JsonDictionary? { return nil }
-    subscript(key: String) -> JsonWrapper? { return nil }
-    subscript(position: Int) -> JsonWrapper { return JsonValue(NSNull()) }
+    var array: JsonArray { return [self] }
+    var dictionary: JsonDictionary { return [:] }
+    subscript(key: String) -> JsonWrapper { return JsonValue(nil) }
+    subscript(position: Int) -> JsonWrapper { return JsonValue(nil) }
     
 }
 

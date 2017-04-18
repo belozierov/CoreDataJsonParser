@@ -8,22 +8,39 @@
 
 import Foundation
 
-struct JsonArray: JsonCollectionWrapper, JsonConvertable {
+struct JsonArray: JsonWrapper, JsonConvertable, Collection, ExpressibleByArrayLiteral {
     
-    private let _array: [Any]
+    private let _array: [Element]
     
-    init(_ array: [Any]) {
+    init(_ array: [Element]) {
         _array = array
     }
     
     // MARK: - JsonWrapper
     
-    var any: Any {
+    var any: Any? {
         return _array.flatMap { $0 is NSNull ? nil : $0 }
     }
     
-    var array: JsonArray? {
+    var array: JsonArray {
         return self
+    }
+    
+    var dictionary: JsonDictionary {
+        guard _array.count == 1 else { return [:] }
+        return first?.dictionary ?? [:]
+    }
+    
+    // MARK: - JsonConvertable
+    
+    func converted<T: SimpleInit>() -> T? {
+        guard _array.count == 1 else { return nil }
+        switch _array[0] {
+        case let t as T: return t
+        case let string as String: return T(string: string)
+        case let number as NSNumber: return T(number: number)
+        default: return nil
+        }
     }
     
     // MARK: - Sequence
@@ -57,6 +74,14 @@ struct JsonArray: JsonCollectionWrapper, JsonConvertable {
     
     func index(after i: Int) -> Int {
         return i + 1
+    }
+    
+    // MARK: - ExpressibleByArrayLiteral
+    
+    typealias Element = Any
+    
+    init(arrayLiteral elements: Element...) {
+        _array = elements
     }
     
 }

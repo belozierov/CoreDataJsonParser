@@ -6,22 +6,22 @@
 //  Copyright © 2017 Beloizerov. All rights reserved.
 //
 
-struct JsonDictionary: JsonCollectionWrapper, JsonConvertable {
+struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
     
-    private let _dictionary: [String: Any]
+    private let _dictionary: [Key: Value]
     
-    init(_ dictionary: [String: Any]) {
+    init(_ dictionary: [Key: Value]) {
         _dictionary = dictionary
     }
     
     // MARK: - JsonWrapper
     
-    subscript(key: String) -> JsonWrapper? {
-        guard let value = _dictionary[key] else { return nil }
+    subscript(key: String) -> JsonWrapper {
+        guard let value = _dictionary[key] else { return JsonValue(nil) }
         return json(value)
     }
     
-    var any: Any {
+    var any: Any? {
         var dictionary = _dictionary
         for (key, value) in _dictionary where value is NSNull {
             dictionary[key] = nil
@@ -29,7 +29,7 @@ struct JsonDictionary: JsonCollectionWrapper, JsonConvertable {
         return dictionary
     }
     
-    var dictionary: JsonDictionary? {
+    var dictionary: JsonDictionary {
         return self
     }
     
@@ -45,7 +45,7 @@ struct JsonDictionary: JsonCollectionWrapper, JsonConvertable {
     
     // MARK: - Collection
     
-    subscript(position: DictionaryIndex<String, Any>) -> (key: String, value: JsonWrapper) {
+    subscript(position: DictionaryIndex<Key, Value>) -> (key: String, value: JsonWrapper) {
         let value = _dictionary[position]
         return (value.key, json(value.value))
     }
@@ -55,16 +55,29 @@ struct JsonDictionary: JsonCollectionWrapper, JsonConvertable {
         return json(first)
     }
     
-    var startIndex: DictionaryIndex<String, Any> {
+    var startIndex: DictionaryIndex<Key, Value> {
         return _dictionary.startIndex
     }
     
-    var endIndex: DictionaryIndex<String, Any> {
+    var endIndex: DictionaryIndex<Key, Value> {
         return _dictionary.endIndex
     }
     
-    func index(after i: DictionaryIndex<String, Any>) -> DictionaryIndex<String, Any> {
+    func index(after i: DictionaryIndex<Key, Value>) -> DictionaryIndex<Key, Value> {
         return _dictionary.index(after: i)
+    }
+    
+    // MARK: - ExpressibleByDictionaryLiteral
+    
+    typealias Key = String
+    typealias Value = Any
+    
+    init(dictionaryLiteral elements: (Key, Value)...) {
+        var dictionary = [Key: Value](minimumCapacity: elements.count)
+        for (key, value) in elements {
+            dictionary[key] = value
+        }
+        _dictionary = dictionary
     }
     
 }

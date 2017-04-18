@@ -64,23 +64,15 @@ func <- <T: NSManagedObject>(left: inout NSOrderedSet?, right: (map: JsonMap?, t
 
 private func parse<T: NSManagedObject>(set: inout Set<T>, map: JsonMap) {
     guard let entity = entityDescription(map: map, type: T.self) else { return }
-    if let jsonArray = map.array {
-        for json in jsonArray {
-            set.insert(T(entity: entity, insertInto: map.context).parsed(json))
-        }
-    } else if let json = map.dictionary {
+    for json in map.array {
         set.insert(T(entity: entity, insertInto: map.context).parsed(json))
     }
 }
 
 private func parse<T: NSManagedObject>(array: inout [T], map: JsonMap) {
     guard let entity = entityDescription(map: map, type: T.self) else { return }
-    if let jsonArray = map.array {
-        for json in jsonArray {
-            array.append(T(entity: entity, insertInto: map.context).parsed(json))
-        }
-    } else if let jsonDictionary = map.dictionary {
-        array.append(T(entity: entity, insertInto: map.context).parsed(jsonDictionary))
+    for json in map.array {
+        array.append(T(entity: entity, insertInto: map.context).parsed(json))
     }
 }
 

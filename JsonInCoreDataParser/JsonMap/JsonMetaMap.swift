@@ -10,15 +10,9 @@ final class JsonMetaMap: JsonMap {
     
     // MARK: - JsonWrapper
     
-    override subscript(key: String) -> JsonMap? {
-        guard let map = super[key] else { return nil }
+    override subscript(key: String) -> JsonMap {
         beginObservingKeys()
-        return map
-    }
-    
-    override var first: JsonWrapper? {
-        beginObservingKeys()
-        return super.first
+        return super[key]
     }
     
     // MARK: - Changed keys
