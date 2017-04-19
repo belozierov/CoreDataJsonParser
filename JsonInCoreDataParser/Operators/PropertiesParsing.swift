@@ -41,15 +41,16 @@ func <- <T: SimpleInit>(left: inout T?, right: Any?) {
 }
 
 func <- <T: SimpleInit>(left: inout T, right: JsonWrapper?) {
-    guard let value: T = convert(any: right) else { return }
+    guard let value: T = right?.converted() else { return }
     left = value
 }
 
 func <- <T: SimpleInit>(left: inout T?, right: JsonWrapper?) {
-    guard let value: T = convert(any: right) else { return }
+    guard let value: T = right?.converted() else { return }
     left = value
 }
 
 private func convert<T: SimpleInit>(any: Any?) -> T? {
-    return any as? T ?? (any as? JsonConvertable)?.converted()
+    guard let any = any else { return nil }
+    return any as? T ?? json(any).converted()
 }

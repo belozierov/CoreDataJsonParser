@@ -6,11 +6,11 @@
 //  Copyright © 2017 Beloizerov. All rights reserved.
 //
 
-struct JsonValue: JsonWrapper, JsonConvertable {
+struct JsonValue: JsonWrapper {
     
     let any: Any?
     
-    init(_ any: Any?) {
+    init(_ any: Any? = nil) {
         self.any = any
     }
     

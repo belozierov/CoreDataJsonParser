@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct JsonArray: JsonWrapper, JsonConvertable, Collection, ExpressibleByArrayLiteral {
+struct JsonArray: JsonWrapper, RandomAccessCollection, ExpressibleByArrayLiteral {
     
     private let _array: [Element]
     
@@ -31,18 +31,6 @@ struct JsonArray: JsonWrapper, JsonConvertable, Collection, ExpressibleByArrayLi
         return first?.dictionary ?? [:]
     }
     
-    // MARK: - JsonConvertable
-    
-    func converted<T: SimpleInit>() -> T? {
-        guard _array.count == 1 else { return nil }
-        switch _array[0] {
-        case let t as T: return t
-        case let string as String: return T(string: string)
-        case let number as NSNumber: return T(number: number)
-        default: return nil
-        }
-    }
-    
     // MARK: - Sequence
     
     func makeIterator() -> AnyIterator<JsonWrapper> {
@@ -61,7 +49,7 @@ struct JsonArray: JsonWrapper, JsonConvertable, Collection, ExpressibleByArrayLi
     }
     
     subscript(position: Int) -> JsonWrapper {
-        return json(position < endIndex ? _array[position] : NSNull())
+        return position < endIndex ? json(_array[position]) : JsonValue()
     }
     
     var startIndex: Int {

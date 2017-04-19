@@ -33,5 +33,5 @@ func json(_ string: String) -> JsonWrapper {
 
 func json(_ data: Data) -> JsonWrapper {
     do { return json(try JSONSerialization.jsonObject(with: data, options: [.allowFragments])) }
-    catch { return JsonValue(nil) }
+    catch { return JsonValue() }
 }

@@ -15,7 +15,7 @@ func <- (left: NSManagedObject, right: Any?) {
 
 func <- <T: NSManagedObject>(left: inout T?, right: JsonMap?) {
     guard let map = right, let entity = entityDescription(map: map, type: T.self) else { return }
-    left = T(entity: entity, insertInto: map.context).parsed(map.wrapper)
+    left = T(entity: entity, insertInto: map.context).parsed(map.wrapper, options: right?.parseOptions)
 }
 
 func <- <T: NSManagedObject>(left: inout Set<T>?, right: JsonMap?) {
@@ -65,14 +65,14 @@ func <- <T: NSManagedObject>(left: inout NSOrderedSet?, right: (map: JsonMap?, t
 private func parse<T: NSManagedObject>(set: inout Set<T>, map: JsonMap) {
     guard let entity = entityDescription(map: map, type: T.self) else { return }
     for json in map.array {
-        set.insert(T(entity: entity, insertInto: map.context).parsed(json))
+        set.insert(T(entity: entity, insertInto: map.context).parsed(json, options: map.parseOptions))
     }
 }
 
 private func parse<T: NSManagedObject>(array: inout [T], map: JsonMap) {
     guard let entity = entityDescription(map: map, type: T.self) else { return }
     for json in map.array {
-        array.append(T(entity: entity, insertInto: map.context).parsed(json))
+        array.append(T(entity: entity, insertInto: map.context).parsed(json, options: map.parseOptions))
     }
 }
 

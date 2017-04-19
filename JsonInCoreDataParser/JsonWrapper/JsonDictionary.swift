@@ -17,7 +17,7 @@ struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
     // MARK: - JsonWrapper
     
     subscript(key: String) -> JsonWrapper {
-        guard let value = _dictionary[key] else { return JsonValue(nil) }
+        guard let value = _dictionary[key] else { return JsonValue() }
         return json(value)
     }
     
@@ -31,6 +31,14 @@ struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
     
     var dictionary: JsonDictionary {
         return self
+    }
+    
+    var array: JsonArray {
+        return _dictionary.isEmpty ? [] : [self]
+    }
+    
+    func converted<T: SimpleInit>() -> T? {
+        return nil
     }
     
     // MARK: - Sequence
@@ -53,6 +61,10 @@ struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
     var first: JsonWrapper? {
         guard let first = _dictionary.first?.value else { return nil }
         return json(first)
+    }
+    
+    var isEmpty: Bool {
+        return _dictionary.isEmpty
     }
     
     var startIndex: DictionaryIndex<Key, Value> {

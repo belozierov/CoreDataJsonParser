@@ -8,42 +8,44 @@
 
 import CoreData
 
-class JsonMap: NSObject, JsonWrapper, JsonConvertable {
+class JsonMap: NSObject, JsonWrapper {
     
-    let wrapper: JsonWrapper
-    unowned let managedObject: NSManagedObject
+    final let wrapper: JsonWrapper
+    final unowned let managedObject: NSManagedObject
+    final private(set) var parseOptions: [NSManagedObject.Options]?
     
-    init(_ wrapper: JsonWrapper, managedObject: NSManagedObject) {
+    init(_ wrapper: JsonWrapper, managedObject: NSManagedObject,
+         parseOptions: [NSManagedObject.Options]? = nil) {
         self.wrapper = wrapper
         self.managedObject = managedObject
+        self.parseOptions = parseOptions
     }
     
-    var context: NSManagedObjectContext? {
+    final var context: NSManagedObjectContext? {
         return managedObject.managedObjectContext
+    }
+    
+    final subscript(options options: NSManagedObject.Options...) -> JsonMap {
+        parseOptions = options
+        return self
     }
     
     // MARK: - JsonWrapper
     
-    var any: Any? { return wrapper.any }
-    var string: String? { return wrapper.string }
-    var bool: Bool? { return wrapper.bool }
-    var int: Int? { return wrapper.int }
-    var int16: Int16? { return wrapper.int16 }
-    var int32: Int32? { return wrapper.int32 }
-    var int64: Int64? { return wrapper.int64 }
-    var float: Float? { return wrapper.float }
-    var double: Double? { return wrapper.double }
-    var date: Date? { return wrapper.date }
-    var data: Data? { return wrapper.data }
-    var array: JsonArray { return wrapper.array }
-    var dictionary: JsonDictionary { return wrapper.dictionary }
-    
-    subscript(key: String) -> JsonMap {
-        return JsonMap(wrapper[key], managedObject: managedObject)
+    final func converted<T: SimpleInit>() -> T? {
+        return wrapper.converted()
     }
     
-    subscript(position: Int) -> JsonMap {
-        return JsonMap(wrapper[position], managedObject: managedObject)
+    final var any: Any? { return wrapper.any }
+    final var array: JsonArray { return wrapper.array }
+    final var dictionary: JsonDictionary { return wrapper.dictionary }
+    
+    subscript(key: String) -> JsonMap {
+        return JsonMap(wrapper[key], managedObject: managedObject, parseOptions: parseOptions)
+    }
+    
+    final subscript(position: Int) -> JsonMap {
+        return JsonMap(wrapper[position], managedObject: managedObject, parseOptions: parseOptions)
     }
     
 }

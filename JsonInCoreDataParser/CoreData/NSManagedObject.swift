@@ -16,7 +16,7 @@ extension NSManagedObject {
     
     // MARK: - Public parsing
     
-    func parse(_ any: Any, options: [Options] = []) {
+    func parse(_ any: Any, options: [Options]? = nil) {
         switch any {
         case let data as Data: parse(json(data), options: options)
         case let string as String: parse(json(string), options: options)
@@ -24,28 +24,33 @@ extension NSManagedObject {
         }
     }
     
-    func parsed(_ any: Any, options: [Options] = []) -> Self {
+    func parsed(_ any: Any, options: [Options]? = nil) -> Self {
         parse(any, options: options)
         return self
     }
     
-    func parse(_ string: String, options: [Options] = []) {
+    func parsed(_ wrapper: JsonWrapper, options: [Options]? = nil) -> Self {
+        parse(wrapper, options: options)
+        return self
+    }
+    
+    func parse(_ string: String, options: [Options]? = nil) {
         parse(json(string), options: options)
     }
     
-    func parse(_ data: Data, options: [Options] = []) {
+    func parse(_ data: Data, options: [Options]? = nil) {
         parse(json(data), options: options)
     }
     
-    func parse(_ dict: [String: Any], options: [Options] = []) {
-        let relationships = options.contains(.onlyAttributes) ? nil : entity.relationshipsByName
+    func parse(_ dict: [String: Any], options: [Options]? = nil) {
+        let relationships = options?.contains(.onlyAttributes) == true ? nil : entity.relationshipsByName
         parse(json: JsonDictionary(dict), attributes: entity.attributesByName, relationships: relationships)
     }
     
-    func parse(_ json: JsonWrapper, options: [Options] = []) {
+    func parse(_ json: JsonWrapper, options: [Options]? = nil) {
         let dictionary = json.dictionary
         if dictionary.isEmpty { return }
-        let relationships = options.contains(.onlyAttributes) ? nil : entity.relationshipsByName
+        let relationships = options?.contains(.onlyAttributes) == true ? nil : entity.relationshipsByName
         parse(json: dictionary, attributes: entity.attributesByName, relationships: relationships)
     }
     
