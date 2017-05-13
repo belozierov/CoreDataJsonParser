@@ -12,6 +12,8 @@ protocol JsonWrapper {
     
     // MARK: - Relations
     
+    var isEmpty: Bool { get }
+    var count: Int { get }
     var array: JsonArray { get }
     var dictionary: JsonDictionary { get }
     subscript(key: String) -> JsonWrapper { get }
@@ -41,11 +43,10 @@ extension JsonWrapper {
     var float: Float? { return converted() }
     var double: Double? { return converted() }
     var date: Date? { return converted() }
-    var data: Data? { return converted() }
     
     // MARK: - Relations
     
-    var array: JsonArray { return any == nil ? [] : [self] }
+    var array: JsonArray { return isEmpty ? [] : [self] }
     var dictionary: JsonDictionary { return [:] }
     subscript(key: String) -> JsonWrapper { return JsonValue() }
     subscript(position: Int) -> JsonWrapper { return JsonValue() }

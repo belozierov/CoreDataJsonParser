@@ -10,12 +10,12 @@ import CoreData
 
 class JsonMap: NSObject, JsonWrapper {
     
-    final let wrapper: JsonWrapper
+    private let wrapper: JsonWrapper
     final unowned let managedObject: NSManagedObject
-    final private(set) var parseOptions: [NSManagedObject.Options]?
+    final private(set) var parseOptions: [ParseOption]?
+    typealias ParseOption = NSManagedObject.ParseOption
     
-    init(_ wrapper: JsonWrapper, managedObject: NSManagedObject,
-         parseOptions: [NSManagedObject.Options]? = nil) {
+    init(_ wrapper: JsonWrapper, managedObject: NSManagedObject, parseOptions: [ParseOption]?) {
         self.wrapper = wrapper
         self.managedObject = managedObject
         self.parseOptions = parseOptions
@@ -25,18 +25,16 @@ class JsonMap: NSObject, JsonWrapper {
         return managedObject.managedObjectContext
     }
     
-    final subscript(options options: NSManagedObject.Options...) -> JsonMap {
+    final subscript(options options: ParseOption...) -> JsonMap {
         parseOptions = options
         return self
     }
     
     // MARK: - JsonWrapper
     
-    final func converted<T: SimpleInit>() -> T? {
-        return wrapper.converted()
-    }
-    
     final var any: Any? { return wrapper.any }
+    final var isEmpty: Bool { return wrapper.isEmpty }
+    final var count: Int { return wrapper.count }
     final var array: JsonArray { return wrapper.array }
     final var dictionary: JsonDictionary { return wrapper.dictionary }
     
@@ -46,6 +44,10 @@ class JsonMap: NSObject, JsonWrapper {
     
     final subscript(position: Int) -> JsonMap {
         return JsonMap(wrapper[position], managedObject: managedObject, parseOptions: parseOptions)
+    }
+    
+    final func converted<T: SimpleInit>() -> T? {
+        return wrapper.converted()
     }
     
 }

@@ -10,9 +10,9 @@ import Foundation
 
 struct JsonArray: JsonWrapper, RandomAccessCollection, ExpressibleByArrayLiteral {
     
-    private let _array: [Element]
+    private let _array: [Any]
     
-    init(_ array: [Element]) {
+    init(_ array: [Any]) {
         _array = array
     }
     
@@ -27,8 +27,9 @@ struct JsonArray: JsonWrapper, RandomAccessCollection, ExpressibleByArrayLiteral
     }
     
     var dictionary: JsonDictionary {
-        guard _array.count == 1 else { return [:] }
-        return first?.dictionary ?? [:]
+        
+        guard _array.count == 1 else { return JsonDictionary([:]) }
+        return first?.dictionary ?? JsonDictionary([:])
     }
     
     // MARK: - Sequence
@@ -46,6 +47,14 @@ struct JsonArray: JsonWrapper, RandomAccessCollection, ExpressibleByArrayLiteral
     var first: JsonWrapper? {
         guard let first = _array.first else { return nil }
         return json(first)
+    }
+    
+    var isEmpty: Bool {
+        return _array.isEmpty
+    }
+    
+    var count: Int {
+        return _array.count
     }
     
     subscript(position: Int) -> JsonWrapper {
@@ -66,9 +75,7 @@ struct JsonArray: JsonWrapper, RandomAccessCollection, ExpressibleByArrayLiteral
     
     // MARK: - ExpressibleByArrayLiteral
     
-    typealias Element = Any
-    
-    init(arrayLiteral elements: Element...) {
+    init(arrayLiteral elements: Any...) {
         _array = elements
     }
     

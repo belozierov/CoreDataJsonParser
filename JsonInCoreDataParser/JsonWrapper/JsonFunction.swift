@@ -17,14 +17,6 @@ func json(_ any: Any) -> JsonWrapper {
     }
 }
 
-func json(_ dictionary: [String: Any]) -> JsonWrapper {
-    return JsonDictionary(dictionary)
-}
-
-func json(_ array: [Any]) -> JsonWrapper {
-    return JsonArray(array)
-}
-
 func json(_ string: String) -> JsonWrapper {
     if JSONSerialization.isValidJSONObject(string),
         let data = string.data(using: .utf8) { return json(data) }

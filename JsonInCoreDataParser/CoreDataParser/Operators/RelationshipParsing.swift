@@ -13,9 +13,17 @@ func <- (left: NSManagedObject, right: Any?) {
     left.parse(right)
 }
 
+func <- (left: NSManagedObject, right: JsonMap) {
+    var options = right.parseOptions
+    if left === right.managedObject {
+        options = (options ?? []) + [.dismissManualParsing]
+    }
+    left.parse(right, options: options)
+}
+
 func <- <T: NSManagedObject>(left: inout T?, right: JsonMap?) {
     guard let map = right, let entity = entityDescription(map: map, type: T.self) else { return }
-    left = T(entity: entity, insertInto: map.context).parsed(map.wrapper, options: right?.parseOptions)
+    left = T(entity: entity, insertInto: map.context).parsed(map, options: map.parseOptions)
 }
 
 func <- <T: NSManagedObject>(left: inout Set<T>?, right: JsonMap?) {

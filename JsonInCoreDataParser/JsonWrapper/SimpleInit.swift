@@ -130,17 +130,3 @@ extension Date: SimpleInit {
     }
     
 }
-
-extension Data: SimpleInit {
-    
-    init?(string: String) {
-        if let data = Data(base64Encoded: string) { self = data }
-        else { return nil }
-    }
-    
-    init?(number: NSNumber) {
-        if let data = Data(base64Encoded: number.stringValue) { self = data }
-        else { return nil }
-    }
-    
-}

@@ -8,9 +8,9 @@
 
 struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
     
-    private let _dictionary: [Key: Value]
+    private let _dictionary: [String: Any]
     
-    init(_ dictionary: [Key: Value]) {
+    init(_ dictionary: [String: Any]) {
         _dictionary = dictionary
     }
     
@@ -53,7 +53,7 @@ struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
     
     // MARK: - Collection
     
-    subscript(position: DictionaryIndex<Key, Value>) -> (key: String, value: JsonWrapper) {
+    subscript(position: DictionaryIndex<String, Any>) -> (key: String, value: JsonWrapper) {
         let value = _dictionary[position]
         return (value.key, json(value.value))
     }
@@ -67,25 +67,26 @@ struct JsonDictionary: JsonWrapper, Collection, ExpressibleByDictionaryLiteral {
         return _dictionary.isEmpty
     }
     
-    var startIndex: DictionaryIndex<Key, Value> {
+    var count: Int {
+        return _dictionary.count
+    }
+    
+    var startIndex: DictionaryIndex<String, Any> {
         return _dictionary.startIndex
     }
     
-    var endIndex: DictionaryIndex<Key, Value> {
+    var endIndex: DictionaryIndex<String, Any> {
         return _dictionary.endIndex
     }
     
-    func index(after i: DictionaryIndex<Key, Value>) -> DictionaryIndex<Key, Value> {
+    func index(after i: DictionaryIndex<String, Any>) -> DictionaryIndex<String, Any> {
         return _dictionary.index(after: i)
     }
     
     // MARK: - ExpressibleByDictionaryLiteral
     
-    typealias Key = String
-    typealias Value = Any
-    
-    init(dictionaryLiteral elements: (Key, Value)...) {
-        var dictionary = [Key: Value](minimumCapacity: elements.count)
+    init(dictionaryLiteral elements: (String, Any)...) {
+        var dictionary = [String: Any](minimumCapacity: elements.count)
         for (key, value) in elements {
             dictionary[key] = value
         }

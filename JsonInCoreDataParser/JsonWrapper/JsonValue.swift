@@ -9,9 +9,11 @@
 struct JsonValue: JsonWrapper {
     
     let any: Any?
+    init(_ any: Any? = nil) { self.any = any }
     
-    init(_ any: Any? = nil) {
-        self.any = any
-    }
+    // MARK: - JsonWrapper
+    
+    var isEmpty: Bool { return any == nil }
+    var count: Int { return isEmpty ? 0 : 1 }
     
 }
